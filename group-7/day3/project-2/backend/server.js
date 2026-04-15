@@ -368,10 +368,12 @@ const upload = multer({
 // ── 研报文本提取工具 ──
 async function extractTextFromPDF(filePath) {
   try {
-    const pdfParse = require('pdf-parse');
+    const { PDFParse } = require('pdf-parse');
     const buf = fs.readFileSync(filePath);
-    const data = await pdfParse(buf);
-    return data.text || '';
+    const parser = new PDFParse({ data: buf });
+    const result = await parser.getText();
+    await parser.destroy();
+    return result.text || '';
   } catch (e) {
     console.log(`[PDF Parse] fallback: ${e.message}`);
     return '[PDF解析不可用] 文件已保存，内容提取需要配置pdf-parse环境';
